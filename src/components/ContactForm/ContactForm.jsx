@@ -1,8 +1,10 @@
 import { nanoid } from "nanoid";
 import { useId } from "react";
-import PropTypes from "prop-types";
 import { Form, Field, Formik, ErrorMessage } from "formik";
+import { useDispatch } from "react-redux";
 import * as Yup from "yup";
+
+import { addContact } from "../../redux/contactsSlice";
 
 import css from "./ContactForm.module.css";
 
@@ -11,7 +13,7 @@ const initialValues = {
   number: "",
 };
 
-const phoneBookCheck = Yup.object().shape({
+const phoneBookSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "To Short")
     .max(50, "To Long!")
@@ -22,29 +24,25 @@ const phoneBookCheck = Yup.object().shape({
     .required("Required"),
 });
 
-export default function ContactForm({ updateContactList }) {
-  const idLabel = useId();
+export default function ContactForm() {
+  const dispatch = useDispatch();
 
-  const handleSubmitForm = (values, actions) => {
+  const handleSubmit = (values, actions) => {
     const id = nanoid();
-
-    updateContactList({
-      id,
-      name: values.name,
-      number: values.number,
-    });
-
+    dispatch(addContact({ id, name: values.name, number: values.number }));
     actions.resetForm();
   };
+
+  const idLabel = useId();
   return (
     <Formik
-      onSubmit={handleSubmitForm}
+      onSubmit={handleSubmit}
       initialValues={initialValues}
-      validationSchema={phoneBookCheck}
+      validationSchema={phoneBookSchema}
     >
-      <Form autoComplete="off">
-        <h1>Contact Form</h1>
-        <div className={css.wrap}>
+      <Form className={css.contactForm} autoComplete="off">
+        <h1 className={css.formTitle}>Contact Form</h1>
+        <div className={css.group}>
           <Field
             className={css.formField}
             type="text"
@@ -52,10 +50,12 @@ export default function ContactForm({ updateContactList }) {
             id={`${idLabel}-'name'`}
             placeholder=" "
           />
-          <label htmlFor={`${idLabel}-'name'`}>Name</label>
+          <label className={css.formLabel} htmlFor={`${idLabel}-'name'`}>
+            Name
+          </label>
           <ErrorMessage name="name" component="span" />
         </div>
-        <div className={css.wrap}>
+        <div className={css.group}>
           <Field
             className={css.formField}
             type="string"
@@ -63,15 +63,15 @@ export default function ContactForm({ updateContactList }) {
             id={`${idLabel}-'number'`}
             placeholder=" "
           />
-          <label htmlFor={`${idLabel}-'number'`}>Number</label>
+          <label className={css.formLabel} htmlFor={`${idLabel}-'number'`}>
+            Number
+          </label>
           <ErrorMessage name="number" component="span" />
         </div>
-        <button type="submit">Add contact</button>
+        <button className={css.formButton} type="submit">
+          Add contact
+        </button>
       </Form>
     </Formik>
   );
 }
-
-ContactForm.propTypes = {
-  updateContactList: PropTypes.func.isRequired,
-};

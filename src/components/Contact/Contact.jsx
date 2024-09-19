@@ -1,15 +1,19 @@
-import { IoPerson } from "react-icons/io5";
-import { FaPhoneAlt } from "react-icons/fa";
-import css from "./Contact.module.css";
+import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import { deleteContact } from "../../redux/contactsSlice";
 
-export default function Contact({ person, onDelete }) {
+export default function Contact({ user }) {
+  const dispatch = useDispatch();
+
   return (
     <>
-      <IoPerson />
-      <p>{person.name}</p>
-      <FaPhoneAlt />
-      <p>{person.number}</p>
-      <button onClick={() => onDelete(person.id)}>Delete</button>
+      <span>{user.name}</span>
+      <span>{user.number}</span>
+      <button onClick={() => dispatch(deleteContact(user.id))}>Delete</button>
     </>
   );
 }
+
+Contact.propTypes = {
+  user: PropTypes.object.isRequired,
+};
